@@ -14,7 +14,7 @@ If using Heroku skip the Configuration step below and add the key to your Heroku
 
 ## Configuration
 
-Run `node setup.js` to initialize your `.env` file or create it yourself to these specs:
+Run `npm run setup-env` to initialize your `.env` file or create it yourself to these specs:
 
 ```
 BOT_TOKEN=XXX
@@ -26,10 +26,10 @@ ALLOWED_ROLES=list,your,roles
 The following commands are then available to your users:
 ```
 // Lists the roles the user is allowed to join
-!role --help
+.role --help
 
 // Join a role
-!role <role name>
+.role <role name>
 ```
 
 

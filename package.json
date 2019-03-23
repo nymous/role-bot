@@ -1,22 +1,23 @@
 {
   "name": "role-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Discord bot to allow users to self assign roles",
   "main": "index.js",
-  "engines": {
-    "node": "6.9.1"
-  },
   "dependencies": {
-    "discord.js": "^11.0.0",
-    "dotenv": "^2.0.0"
+    "discord.js": "^11.4.2",
+    "erlpack": "github:discordapp/erlpack"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "dotenv-cli": "^2.0.0"
+  },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "dotenv node index.js",
+    "setup-env": "node -e \"(fs => fs.existsSync('.env') || fs.copyFileSync('.env.example', '.env'))(require('fs'))\""
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/messerli90/role-bot"
+    "url": "https://github.com/nymous/role-bot"
   },
   "keywords": [
     "discord",
@@ -24,9 +25,12 @@
     "bot"
   ],
   "author": "Michael Messerli <michaelamesserli@gmail.com>",
+  "contributors": [
+    "Thomas Gaudin <thomas.gaudin@centraliens-lille.org"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/messerli90/role-bot/issues"
+    "url": "https://github.com/nymous/role-bot/issues"
   },
-  "homepage": "https://github.com/messerli90/role-bot#readme"
+  "homepage": "https://github.com/nymous/role-bot#readme"
 }

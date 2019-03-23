@@ -1,68 +1,71 @@
-let Discord = require('discord.js')
-let Client = new Discord.Client()
-let dotenv = require('dotenv');
+const Discord = require('discord.js')
+const Client = new Discord.Client()
 
-// Grabs the BOT_TOKEN from .env and stores in on the `process.env`
-dotenv.load()
-
-let allowedRoles = process.env.ALLOWED_ROLES.split(',')
-let botToken = process.env.BOT_TOKEN
+/**
+ * @type [string]
+ */
+const allowedRoles = process.env.ALLOWED_ROLES.split(',')
+const botToken = process.env.BOT_TOKEN
+const prefix = process.env.PREFIX
 
 // allowed strings
-let allowedString = ''
-allowedRoles.forEach((role) => {
-  allowedString = allowedString.concat('- ' + role + '\n')
-})
+const allowedString = allowedRoles.sort().map(role => `- ${role}`).join('\n')
 
 Client.on('message', msg => {
-  // Set prefix
-  let prefix = "!"
-
   if (!msg.content.startsWith(prefix)
     || msg.author.bot
   ) return
 
-  if (msg.content.startsWith(prefix + 'role')) {
+  if (msg.content.startsWith(`${prefix}role`)) {
 
     // Get args
-    let args = msg.content.split(" ");
+    const args = msg.content.split(" ");
 
     if (args.length < 2 || args[1] == '--help') {
-      msg.channel.sendMessage('These are the roles you\'re allowed to join: \n'+
-        allowedString +
-        '\nuse "!role `<role_name>` to join a role')
+      msg.channel.send(`Voilà les rôles disponibles :
+${allowedString}
+Tape \`${prefix}role <role_name>\` pour te l'ajouter ou te le supprimer`)
 
       return
     }
 
     // Get the role
-    let role = msg.guild.roles.find("name", args[1].toLowerCase());
+    const role = msg.guild.roles.find(role => role.name === args[1].toLowerCase())
 
     if (!role || role === null) {
-      msg.channel.sendMessage('Could not find a role by that name.')
+      msg.channel.send(`Oh oh, ce rôle n'existe pas.`)
+        .then(msg => msg.delete(2000))
+        .then(() => msg.delete())
       return
     }
 
     if (allowedRoles.indexOf(role.name) === -1) {
-      msg.channel.sendMessage('Doesn\'t look like you\'re allowed to join that group. \nFor a list of allowed roles type `!role --help`')
+      msg.channel.send(`Eh, ce groupe est interdit !\nPour avoir une liste des rôles autorisés tape \`${prefix}role --help\`.`)
+        .then(msg => msg.delete(2000))
+        .then(() => msg.delete())
       return
     }
 
-    msg.member.addRole(role).catch(console.error);
-    msg.channel.sendMessage('You\'ve been added to: ' + role.name)
+    const memberHasRole = msg.member.roles.find(role => role.name === args[1].toLowerCase())
+
+    if (!memberHasRole) {
+      msg.member.addRole(role).catch(console.error);
+      msg.channel.send(`Tu as reçu le rôle ${role}`, {reply: msg.member})
+        .then(msg => msg.delete(2000))
+        .then(() => msg.delete())
+    } else {
+      msg.member.removeRole(role).catch(console.error);
+      msg.channel.send(`Tu n'as plus le rôle ${role}`, {reply: msg.member})
+        .then(msg => msg.delete(2000))
+        .then(() => msg.delete())
+    }
 
     return
   }
 })
 
-Client.on("guildMemberAdd", member => {
-    console.log(`New User "${member.user.username}" has joined "${member.guild.name}"` );
-
-    //member.guild.defaultChannel.sendMessage(`Welcome "${member.user.username}"! Be sure to set your platform by typing "!role"`);
-})
-
 Client.on('ready', () => {
-  Client.user.setGame('type !role --help')
+  Client.user.setActivity(`${prefix}role --help`)
   console.log(`Ready to set roles in ${Client.channels.size} channels on ${Client.guilds.size} servers, for a total of ${Client.users.size} users.`)
 })
 
